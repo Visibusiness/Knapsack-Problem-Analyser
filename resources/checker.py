@@ -3,6 +3,7 @@ import shutil
 import time
 import json
 import logging
+import subprocess
 
 # Configure logging
 log_dir = '../log'
@@ -46,9 +47,11 @@ def run_tests():
     dynamic_values = []
     greedy_values = []
     differences = []
+    ratio = []
+    weights = []
 
     for i in range(1, 31):
-        input_file = f"../in/test{str(i)}.in"
+        input_file = f"../knapsack_tests/test{str(i)}.in"
         dynamic_out = f"../out/test{str(i)}_dynamic.out"
         greedy_out = f"../out/test{str(i)}_greedy.out"
 
@@ -60,10 +63,21 @@ def run_tests():
         os.system(f"../bin/greedy < {input_file} > {greedy_out}")
         greedy_times.append(time.time() - start_time)
 
-        if i <= 10:
-            brute_out = f"../out/test{str(i).zfill(2)}_bruteforce.out"
-            start_time = time.time()
-            os.system(f"../bin/bruteforce < {input_file} > {brute_out}")
+        with open(input_file, 'r') as f:
+            first_line = f.readline().strip()
+            first_element = first_line.split()[1]
+            weights.append(int(first_element))
+
+        
+        brute_out = f"../out/test{str(i).zfill(2)}_bruteforce.out"
+        start_time = time.time()
+        process = subprocess.Popen(f"../bin/bruteforce < {input_file} > {brute_out}", shell=True)
+        try:
+            process.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            bruteforce_times.append(">30s")
+        else:
             bruteforce_times.append(time.time() - start_time)
 
         # Compare dynamic and greedy outputs
@@ -76,6 +90,8 @@ def run_tests():
         dynamic_values.append(dynamic_value)
         greedy_values.append(greedy_value)
         differences.append(dynamic_value - greedy_value)
+        ratio.append((greedy_value / dynamic_value * 100))
+
 
     # Save times to a JSON file
     with open(f'{json_folder}/times.json', 'w') as f:
@@ -88,13 +104,17 @@ def run_tests():
     # Save values to a separate JSON file
     with open(f'{json_folder}/values.json', 'w') as f:
         json.dump({
-            'dynamic': dynamic_values,
+            'dynamic': dynamic_values, 
             'greedy': greedy_values
         }, f)
 
     # Save differences to a separate JSON file
     with open(f'{json_folder}/differences.json', 'w') as f:
-        json.dump(differences, f)
+        json.dump({
+            'differences': differences,
+            'ratio':ratio,
+            'weights': weights
+            }, f)
 
 def main():
     compile_programs()

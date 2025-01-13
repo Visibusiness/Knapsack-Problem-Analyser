@@ -1,20 +1,34 @@
 #include <iostream>
-
-#define MAX(a, b) (a > b ? a : b)
-
+#include <vector>
+#include <algorithm>
 using namespace std;
 
-int v[10000];
+int n;
+vector<int> weights;
+vector<int> values;
+
+int knapSackDynamic(int W) {
+
+    vector<int> dp(W + 1, 0);
+
+    for (int i = 0; i < n; i++)
+        for (int w = W; w >= weights[i]; w--)
+			  dp[w] = max(dp[w], dp[w - weights[i]] + values[i]);
+
+    return dp[W];
+}
 
 
-int main()
-{
-    int N, g, w, p;
-    cin >> N >> g;
-    for (int n = 0; n < N; n++) {
-        cin >> w >> p;
-        for (int i = g; i >= w && i >= 1; i--)
-            v[i] = MAX(v[i], v[i - w] + p);
+int main() {
+    int W;
+    cin >> n >> W;
+    weights.reserve(n);
+    values.reserve(n);
+    for (int i = 0; i < n; ++i) {
+        int w, v;
+        cin >> w >> v;
+        weights.push_back(w);
+        values.push_back(v);
     }
-    cout << v[g] << endl;
+	cout << knapSackDynamic(W) << '\n'; 
 }

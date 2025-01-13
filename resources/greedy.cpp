@@ -1,46 +1,48 @@
-
-// Heuristic solution for the Knapsack problem
 #include <iostream>
 #include <vector>
 #include <algorithm>
 using namespace std;
 
-struct Item {
-    int weight, value;
-    double ratio;
-};
+int n;
+vector<int> weights;
+vector<int> values;
 
-bool compare(Item a, Item b) {
-    return a.ratio > b.ratio;
-}
+int knapsackGreedy(int W) {
+    struct Item {
+        int value, weight;
+        double ratio;
+        bool operator < (const Item& other) const {
+            return this->ratio > other.ratio;
+        }
+    };
 
-int knapsack(int W, vector<int>& wt, vector<int>& val, int n) {
-    vector<Item> items;
-    for (int i = 0; i < n; i++) {
-        items.push_back({wt[i], val[i], (double)val[i] / wt[i]});
-    }
-    sort(items.begin(), items.end(), compare);
+    vector<Item> items(n);
+    for (int i = 0; i < n; i++)
+        items[i] = {values[i], weights[i], (double)values[i] / weights[i]};
+
+    sort(items.begin(), items.end());
 
     int totalValue = 0;
-    for (auto& item : items) {
-        if (W >= item.weight) {
-            W -= item.weight;
-            totalValue += item.value;
-        } else {
-            totalValue += item.ratio * W;
-            break;
+    for (int i = 0; i < n && W > 0; i++)
+        if (W >= items[i].weight) {
+            W -= items[i].weight;
+            totalValue += items[i].value;
         }
-    }
+
     return totalValue;
 }
 
+
 int main() {
-    int n, W;
+    int W;
     cin >> n >> W;
-    vector<int> wt(n), val(n);
+    weights.reserve(n);
+    values.reserve(n);
     for (int i = 0; i < n; ++i) {
-        cin >> wt[i] >> val[i];
+        int w, v;
+        cin >> w >> v;
+        weights.push_back(w);
+        values.push_back(v);
     }
-    cout << knapsack(W, wt, val, n) << endl;
-    return 0;
+	cout << knapsackGreedy(W) << '\n'; 
 }

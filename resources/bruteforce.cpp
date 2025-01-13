@@ -1,25 +1,36 @@
-
-// Brute-force solution for the Knapsack problem
 #include <iostream>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
-int knapsack(int W, vector<int>& wt, vector<int>& val, int n) {
-    if (n == 0 || W == 0)
+int n;
+vector<int> weights;
+vector<int> values;
+
+int knapSackBacktracking(int W, int i) {
+
+    if (W <= 0 || i >= n)
         return 0;
-    if (wt[n-1] > W)
-        return knapsack(W, wt, val, n-1);
-    return max(val[n-1] + knapsack(W - wt[n-1], wt, val, n-1),
-               knapsack(W, wt, val, n-1));
+
+	int itemNotIncluded = knapSackBacktracking(W, i + 1);
+	if (W < weights[i])
+		return itemNotIncluded;
+
+	int itemIncluded = values[i] + knapSackBacktracking(W - weights[i], i + 1);
+	return max(itemNotIncluded, itemIncluded);
 }
 
+
 int main() {
-    int n, W;
+    int W;
     cin >> n >> W;
-    vector<int> wt(n), val(n);
+    weights.reserve(n);
+    values.reserve(n);
     for (int i = 0; i < n; ++i) {
-        cin >> wt[i] >> val[i];
+        int w, v;
+        cin >> w >> v;
+        weights.push_back(w);
+        values.push_back(v);
     }
-    cout << knapsack(W, wt, val, n) << endl;
-    return 0;
+	cout << knapSackBacktracking(W, 0) << '\n'; 
 }

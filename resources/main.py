@@ -32,8 +32,6 @@ subprocess.run(['python3', 'plot_differences.py'])
 # Run plot_values.py
 subprocess.run(['python3', 'plot_values.py'])
 
-# Run plot_comparison.py
-subprocess.run(['python3', 'plot_comparison.py'])
 
 # Close the log file
 log_file.close()

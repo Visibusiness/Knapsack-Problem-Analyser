@@ -15,8 +15,8 @@ greedy_values = values['greedy']
 # print("Greedy values:", greedy_values)
 
 # Plot the values
-plt.plot(test_cases, dynamic_values, label='Dynamic', marker='o', color='red')
-plt.plot(test_cases, greedy_values, label='Greedy', marker='o', color='black')
+plt.plot(test_cases, dynamic_values, 'g--o', label='Dynamic')
+plt.plot(test_cases, greedy_values, 'r--o', label='Greedy')
 
 plt.xlabel('Test Case')
 plt.ylabel('Result Value')
